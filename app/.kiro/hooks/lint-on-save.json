@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Lint y formato al guardar Python",
+      "trigger": "PostFileSave",
+      "matcher": "\\.py$",
+      "action": {
+        "type": "command",
+        "command": "cd app/src && flake8 . --max-line-length=88 --exclude=migrations"
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+# Entorno virtual
+venv/
+env/
+.venv/
+
+# Variables de entorno — NUNCA subir a Git
+.env
+
+# Base de datos SQLite — generada por Django al ejecutar migrate
+db.sqlite3
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ficheros de migraciones compilados (conservar los .py de migraciones)
+*.pyc
+
+# Kiro IDE
+.kiro/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Ficheros del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Cobertura de tests
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Distribución / empaquetado
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log

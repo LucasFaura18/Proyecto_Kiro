@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verificar migraciones pendientes al guardar models.py",
+      "trigger": "PostFileSave",
+      "matcher": "models\\.py$",
+      "action": {
+        "type": "agent",
+        "prompt": "Se ha modificado un fichero models.py. Recuerda verificar si es necesario crear nuevas migraciones con 'python manage.py makemigrations --check'. Avisa si el modelo modificado requiere migración."
+      }
+    }
+  ]
+}

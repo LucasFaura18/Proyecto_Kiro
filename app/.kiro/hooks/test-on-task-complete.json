@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Ejecutar tests al completar tarea de spec",
+      "trigger": "PostTaskExec",
+      "action": {
+        "type": "command",
+        "command": "cd app/src && python -m pytest watchlist/tests/ -v --tb=short"
+      }
+    }
+  ]
+}
