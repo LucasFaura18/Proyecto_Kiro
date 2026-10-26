@@ -243,10 +243,6 @@ Y es menos necesario cuando:
 - Se hacen correcciones puntuales o exploración rápida.
 - El alcance de la tarea es trivial y perfectamente claro.
 
-> *"El objetivo no es demostrar cuánto código puede generar una IA, sino aprender a dirigir y supervisar el desarrollo de software asistido por IA."*  
-> — Enunciado de la práctica
-
-Kiro, precisamente, está diseñado con esa filosofía en su núcleo.
 
 ---
 
