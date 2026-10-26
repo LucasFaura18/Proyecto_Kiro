@@ -34,9 +34,8 @@
 - Todas las páginas deben ser responsive
 
 ## Seguridad
-- Nunca hardcodear la `SECRET_KEY` — usar variables de entorno
-- Usar `django-environ` o `python-decouple` para la configuración
-- Fichero `.env` en `.gitignore` siempre
+- La `SECRET_KEY` se define directamente en `settings.py` (proyecto local/académico, no expuesto)
+- Para una versión de producción futura se migraría a variables de entorno
 - CSRF protection activa en todos los formularios
 
 ## Testing

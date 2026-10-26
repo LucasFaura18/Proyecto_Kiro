@@ -3,9 +3,6 @@ venv/
 env/
 .venv/
 
-# Variables de entorno — NUNCA subir a Git
-.env
-
 # Base de datos SQLite — generada por Django al ejecutar migrate
 db.sqlite3
 

@@ -22,7 +22,6 @@
 ## Estructura de dependencias (`requirements.txt`)
 ```
 Django==4.2.16
-django-environ==0.11.2
 pytest==7.4.4
 pytest-django==4.7.0
 flake8==7.0.0
