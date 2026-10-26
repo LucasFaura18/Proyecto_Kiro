@@ -5,6 +5,20 @@
 
 ---
 
+## Reparto entre dos personas
+
+- **Parte A — Datos y lógica de negocio (backend)**: BLOQUE 0, BLOQUE 1, BLOQUE 2, BLOQUE 3 y tests de esa capa (T-11.1, T-11.2, T-11.3). En v1.1: T-12.1 a T-12.5.
+- **Parte B — Vistas, plantillas y calidad (frontend + controlador)**: BLOQUE 4, BLOQUE 5 (T-05 a T-09), BLOQUE 6, BLOQUE 7 (T-11.4, T-11.5). En v1.1: T-12.6 a T-12.9.
+
+**Contrato de interfaz (lo que A expone y B consume, definido en `design.md`):**
+
+- Modelo `Title` con campos `name, title_type, genre, year, status, rating, notes, created_at, updated_at` y los choices `TYPE_CHOICES`, `GENRE_CHOICES`, `STATUS_CHOICES`.
+- `watchlist.services.get_next_status(current: str) -> str`
+- `watchlist.services.get_filtered_titles(genre=None, status=None) -> QuerySet[Title]`
+- `watchlist.forms.TitleForm` (ModelForm) con los 7 campos y widgets Bootstrap (`form-control` / `form-select`).
+
+---
+
 ## Leyenda de estado
 
 | Símbolo | Significado |
@@ -18,23 +32,23 @@
 ## BLOQUE 0 — Inicialización del proyecto
 
 ### T-00 · Estructura y configuración base
-- [ ] **T-00.1** Crear entorno virtual Python (`venv`) e instalar dependencias de `requirements.txt`
-- [ ] **T-00.2** Crear proyecto Django `config` con `django-admin startproject`
-- [ ] **T-00.3** Crear app Django `watchlist` con `python manage.py startapp`
-- [ ] **T-00.4** Configurar `settings.py`: base de datos SQLite, templates, apps instaladas, idioma español
-- [ ] **T-00.5** Crear fichero `.env` con `SECRET_KEY` y `DEBUG=True`
-- [ ] **T-00.6** Verificar que `python manage.py runserver` arranca sin errores
+- [x] **T-00.1** Crear entorno virtual Python (`venv`) e instalar dependencias de `requirements.txt`
+- [x] **T-00.2** Crear proyecto Django `config` con `django-admin startproject`
+- [x] **T-00.3** Crear app Django `watchlist` con `python manage.py startapp`
+- [x] **T-00.4** Configurar `settings.py`: base de datos SQLite, templates, apps instaladas, idioma español
+- [x] **T-00.5** Crear fichero `.env` con `SECRET_KEY` y `DEBUG=True`
+- [x] **T-00.6** Verificar que `python manage.py runserver` arranca sin errores
 
 ---
 
 ## BLOQUE 1 — Modelo de datos (→ US-01, US-02, US-03)
 
 ### T-01 · Modelo `Title`
-- [ ] **T-01.1** Definir modelo `Title` en `watchlist/models.py` con todos los campos y choices del diseño
-- [ ] **T-01.2** Añadir método `__str__` que devuelva el nombre del título
-- [ ] **T-01.3** Añadir método `get_next_status()` al modelo
-- [ ] **T-01.4** Registrar modelo en `watchlist/admin.py` con `list_display` útil
-- [ ] **T-01.5** Crear y aplicar migración inicial (`makemigrations` + `migrate`)
+- [x] **T-01.1** Definir modelo `Title` en `watchlist/models.py` con todos los campos y choices del diseño
+- [x] **T-01.2** Añadir método `__str__` que devuelva el nombre del título
+- [x] **T-01.3** Añadir método `get_next_status()` al modelo
+- [x] **T-01.4** Registrar modelo en `watchlist/admin.py` con `list_display` útil
+- [x] **T-01.5** Crear y aplicar migración inicial (`makemigrations` + `migrate`)
 - [ ] **T-01.6** Verificar el modelo en el admin de Django con datos de prueba
 
 *Requisitos cubiertos: US-01 (campo base), US-02 (campo status), US-03 (campo rating)*
@@ -44,8 +58,8 @@
 ## BLOQUE 2 — Capa de servicios (→ US-02, US-04)
 
 ### T-02 · `services.py`
-- [ ] **T-02.1** Implementar `get_next_status(current: str) -> str` con la secuencia pending→watching→watched
-- [ ] **T-02.2** Implementar `get_filtered_titles(genre, status) -> QuerySet` con filtros opcionales y orden por `-created_at`
+- [x] **T-02.1** Implementar `get_next_status(current: str) -> str` con la secuencia pending→watching→watched
+- [x] **T-02.2** Implementar `get_filtered_titles(genre, status) -> QuerySet` con filtros opcionales y orden por `-created_at`
 
 *Requisitos cubiertos: US-02 (lógica de estado), US-04 (filtrado)*
 
@@ -54,10 +68,10 @@
 ## BLOQUE 3 — Formularios (→ US-01, US-03)
 
 ### T-03 · `TitleForm`
-- [ ] **T-03.1** Crear `TitleForm(ModelForm)` en `watchlist/forms.py` con todos los campos del diseño
-- [ ] **T-03.2** Implementar `clean()`: limpiar `rating` si `status != "watched"`
-- [ ] **T-03.3** Implementar validación de `year` (1888 ≤ year ≤ año_actual + 2)
-- [ ] **T-03.4** Añadir widgets Bootstrap 5 a los campos del formulario (clases `form-control`, `form-select`)
+- [x] **T-03.1** Crear `TitleForm(ModelForm)` en `watchlist/forms.py` con todos los campos del diseño
+- [x] **T-03.2** Implementar `clean()`: limpiar `rating` si `status != "watched"`
+- [x] **T-03.3** Implementar validación de `year` (1888 ≤ year ≤ año_actual + 2)
+- [x] **T-03.4** Añadir widgets Bootstrap 5 a los campos del formulario (clases `form-control`, `form-select`)
 
 *Requisitos cubiertos: US-01 (AC-01.2, AC-01.3, AC-01.4), US-03 (AC-03.1)*
 
@@ -129,9 +143,9 @@
 ## BLOQUE 7 — Tests
 
 ### T-11 · Tests unitarios
-- [ ] **T-11.1** Test de `get_next_status()`: secuencia correcta y valor inválido
-- [ ] **T-11.2** Test de `TitleForm.clean()`: rating se limpia cuando status ≠ "watched"
-- [ ] **T-11.3** Test de `get_filtered_titles()`: filtro por género, por estado, combinado y sin filtro
+- [x] **T-11.1** Test de `get_next_status()`: secuencia correcta y valor inválido
+- [x] **T-11.2** Test de `TitleForm.clean()`: rating se limpia cuando status ≠ "watched"
+- [x] **T-11.3** Test de `get_filtered_titles()`: filtro por género, por estado, combinado y sin filtro
 - [ ] **T-11.4** Test de `TitleCreateView`: POST válido crea título y redirige; POST inválido devuelve errores
 - [ ] **T-11.5** Test de `TitleStatusUpdateView`: el estado avanza correctamente
 
