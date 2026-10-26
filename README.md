@@ -155,3 +155,50 @@ Kiro implementó cada tarea de `tasks.md` en orden, con los hooks verificando ca
 | Documentación de Django 4.2 | [docs.djangoproject.com](https://docs.djangoproject.com/en/4.2/) |
 | Bootstrap 5 | [getbootstrap.com](https://getbootstrap.com/) |
 | pytest-django | [pytest-django.readthedocs.io](https://pytest-django.readthedocs.io/) |
+
+
+PARTE A — Datos y Lógica de Negocio (Backend)
+Dueña de: config/, models.py, services.py, forms.py, admin.py, migraciones, requirements.txt, settings.py, .env.
+
+Bloque	Tareas	Qué entrega
+B0 · Inicialización	T-00.1 → T-00.6	Proyecto Django config + app watchlist, venv, settings (SQLite, español, templates), .env con SECRET_KEY, runserver operativo
+B1 · Modelo	T-01.1 → T-01.6	Title con todos los campos y choices, __str__, get_next_status(), registro en admin, migración inicial
+B2 · Servicios	T-02.1, T-02.2	get_next_status(current) y get_filtered_titles(genre, status)
+B3 · Formularios	T-03.1 → T-03.4	TitleForm(ModelForm) con clean() (limpiar rating si no es watched, validar year 1888–actual+2) y widgets Bootstrap 5
+v1.1	T-12.1 → T-12.5	Modelo Platform, ManyToManyField, data migration de las 6 plataformas, campo en TitleForm, extensión de get_filtered_titles() con filtro de plataforma
+Tests propios (opcional pero recomendado): T-11.1 (get_next_status), T-11.2 (TitleForm.clean), T-11.3 (get_filtered_titles).
+
+PARTE B — Vistas, Plantillas y Calidad (Frontend + Controlador + QA)
+Dueña de: views.py, urls.py, todo templates/ (base.html, partials y plantillas de página) y tests/ de vistas.
+
+Bloque	Tareas	Qué entrega
+B4 · Templates base	T-04.1 → T-04.4	base.html (navbar + Bootstrap/Font Awesome CDN), partials _star_rating.html, _filter_bar.html, _title_card.html
+B5 · Vistas y URLs	T-05 → T-09	TitleListView (con filtros GET), TitleCreateView, TitleUpdateView, TitleStatusUpdateView (POST), TitleDeleteView; urls.py con name=; plantillas title_list.html, title_form.html, title_confirm_delete.html; botones de estado/estrellas en _title_card.html
+B6 · No funcionales	T-10.1 → T-10.3	Responsive a 375px, aria-label en botones, role="alert" en errores de formulario
+B7 · Tests	T-11.4, T-11.5	Tests de TitleCreateView (POST válido/inválido) y TitleStatusUpdateView (avance de estado)
+v1.1	T-12.6 → T-12.9	Selector de plataforma en _filter_bar.html, plataformas en _title_card.html, verificación de combinación de filtros, tests de plataforma
+Contrato de interfaz (lo que A expone y B consume)
+Como ambos trabajamos contra design.md, B no necesita que A termine para empezar las plantillas base, pero sí para conectar las vistas. A debe respetar exactamente estos nombres:
+
+Modelo Title: campos name, title_type, genre, year, status, rating, notes, created_at, updated_at y los choices TYPE_CHOICES, GENRE_CHOICES, STATUS_CHOICES del diseño.
+Servicios: get_next_status(current: str) -> str, get_filtered_titles(genre, status) -> QuerySet.
+Formulario: TitleForm con los 7 campos del diseño y widgets con clases form-control/form-select (para que las plantillas de B rendericen sin tocar el form).
+Fases de ejecución (paralelizable)
+
+Fase 1  A: T-00 (esqueleto Django)  ── bloqueante para todos
+Fase 2  A: T-01, T-02, T-03  ║  B: T-04 (templates base desde design.md)
+Fase 3  B: T-05 → T-09 (necesita modelo+servicios+form de A listos)
+Fase 4  A: tests de su capa (T-11.1–11.3)  ║  B: T-10 + tests de vistas (T-11.4–11.5)
+Fase 5  v1.1: A: T-12.1–12.5  →  B: T-12.6–12.9
+B puede arrancar la Fase 2 a la vez que A construye el modelo, porque base.html y los partials se hacen contra el diseño, no contra el código. El punto de sincronización real es el inicio de la Fase 3, cuando A ya tiene Title, services.py y TitleForm.
+
+Notas de coordinación
+Sin conflictos de ficheros: A nunca toca templates/, B nunca toca models.py/services.py/forms.py. El db.sqlite3 y las migraciones los genera A.
+Tests: por la convención "un fichero de test por app", propongo 
+test_models.py
+ y test_services.py (A) + 
+test_views.py
+ (B). Cada uno testea su capa.
+Hooks: ya existen lint-on-save y test-on-task-complete; ambos os avisan al guardar/guardar tarea, así que da igual en qué fichero trabajéis.
+v1.1: es un cambio de requisitos formal. Hay que editar antes requirements.md (US-06 ya está) y design.md (diagrama ER v1.1 ya está), según el bloque 8 de tasks.md. A hace la parte de datos y B la de presentación, en ese orden.
+¿Quieres que marque directamente esta asignación en tasks.md (por ejemplo etiquetando cada tarea con [A] / [B]) para que quede trazado en el repo, o prefieres dejarlo solo como plan?
