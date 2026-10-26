@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar «{{ title.name }}» — CineTrack{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-5">
+
+    <div class="card border-danger shadow-sm">
+      <div class="card-header bg-danger text-white">
+        <h1 class="h5 mb-0">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar eliminación
+        </h1>
+      </div>
+      <div class="card-body">
+
+        <div class="alert alert-warning" role="alert">
+          ¿Seguro que quieres eliminar <strong>«{{ title.name }}»</strong>?
+          Esta acción no se puede deshacer.
+        </div>
+
+        <!-- Resumen del título -->
+        <ul class="list-group list-group-flush mb-4">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Tipo</span>
+            <strong>{{ title.get_title_type_display }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Género</span>
+            <strong>{{ title.get_genre_display }}</strong>
+          </li>
+          {% if title.year %}
+            <li class="list-group-item d-flex justify-content-between">
+              <span class="text-muted">Año</span>
+              <strong>{{ title.year }}</strong>
+            </li>
+          {% endif %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Estado</span>
+            <strong>{{ title.get_status_display }}</strong>
+          </li>
+        </ul>
+
+        <form method="post" class="d-flex gap-2 flex-wrap">
+          {% csrf_token %}
+          <button
+            type="submit"
+            class="btn btn-danger"
+            aria-label="Confirmar eliminación de '{{ title.name }}'"
+          >
+            <i class="fa-solid fa-trash me-1"></i>Sí, eliminar
+          </button>
+          <a
+            href="{% url 'title-list' %}"
+            class="btn btn-outline-secondary"
+            aria-label="Cancelar eliminación y volver a la lista"
+          >
+            <i class="fa-solid fa-xmark me-1"></i>Cancelar
+          </a>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

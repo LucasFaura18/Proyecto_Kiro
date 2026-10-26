@@ -1,0 +1,14 @@
+{% comment %}
+Partial: _star_rating.html
+Uso: {% include "watchlist/partials/_star_rating.html" with rating=title.rating %}
+Muestra entre 1 y 5 estrellas. Si rating es None o 0, muestra 5 estrellas vacías.
+{% endcomment %}
+<span aria-label="Puntuación: {{ rating|default:'sin valorar' }} de 5 estrellas">
+  {% for i in "12345" %}
+    {% if rating and forloop.counter <= rating %}
+      <i class="fa-solid fa-star star-filled"></i>
+    {% else %}
+      <i class="fa-regular fa-star star-empty"></i>
+    {% endif %}
+  {% endfor %}
+</span>

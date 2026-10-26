@@ -1,0 +1,65 @@
+{% comment %}
+Partial: _filter_bar.html
+Uso: {% include "watchlist/partials/_filter_bar.html" with genre_choices=genre_choices status_choices=status_choices current_genre=current_genre current_status=current_status %}
+{% endcomment %}
+<form method="get" action="{% url 'title-list' %}" class="row g-2 align-items-end mb-4">
+  <!-- Filtro: Género -->
+  <div class="col-12 col-sm-5 col-md-4">
+    <label for="id_filter_genre" class="form-label fw-semibold">
+      <i class="fa-solid fa-masks-theater me-1"></i>Género
+    </label>
+    <select
+      id="id_filter_genre"
+      name="genre"
+      class="form-select"
+      aria-label="Filtrar por género"
+    >
+      <option value="">Todos</option>
+      {% for key, label in genre_choices %}
+        <option value="{{ key }}" {% if current_genre == key %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Filtro: Estado -->
+  <div class="col-12 col-sm-5 col-md-4">
+    <label for="id_filter_status" class="form-label fw-semibold">
+      <i class="fa-solid fa-eye me-1"></i>Estado
+    </label>
+    <select
+      id="id_filter_status"
+      name="status"
+      class="form-select"
+      aria-label="Filtrar por estado"
+    >
+      <option value="">Todos</option>
+      {% for key, label in status_choices %}
+        <option value="{{ key }}" {% if current_status == key %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Botón aplicar -->
+  <div class="col-12 col-sm-2 col-md-2">
+    <button type="submit" class="btn btn-primary w-100" aria-label="Aplicar filtros">
+      <i class="fa-solid fa-magnifying-glass me-1"></i>Filtrar
+    </button>
+  </div>
+
+  <!-- Enlace limpiar filtros (solo si hay alguno activo) -->
+  {% if current_genre or current_status %}
+    <div class="col-12 col-md-2 text-md-start">
+      <a
+        href="{% url 'title-list' %}"
+        class="btn btn-outline-secondary w-100"
+        aria-label="Limpiar todos los filtros"
+      >
+        <i class="fa-solid fa-xmark me-1"></i>Limpiar
+      </a>
+    </div>
+  {% endif %}
+</form>

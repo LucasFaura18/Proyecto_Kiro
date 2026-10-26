@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if form.instance.pk %}Editar «{{ form.instance.name }}»{% else %}Añadir título{% endif %}
+   — CineTrack
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h1 class="h5 mb-0">
+          {% if form.instance.pk %}
+            <i class="fa-solid fa-pen me-2"></i>Editar «{{ form.instance.name }}»
+          {% else %}
+            <i class="fa-solid fa-plus me-2"></i>Añadir título
+          {% endif %}
+        </h1>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Errores no asociados a un campo específico -->
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {% for error in form.non_field_errors %}
+              <p class="mb-0">{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <!-- name -->
+          <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">
+              Título <span class="text-danger" aria-hidden="true">*</span>
+            </label>
+            {{ form.name }}
+            {% if form.name.errors %}
+              <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                {% for error in form.name.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- title_type y genre en la misma fila -->
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label for="{{ form.title_type.id_for_label }}" class="form-label fw-semibold">
+                Tipo <span class="text-danger" aria-hidden="true">*</span>
+              </label>
+              {{ form.title_type }}
+              {% if form.title_type.errors %}
+                <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                  {% for error in form.title_type.errors %}{{ error }}{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            <div class="col-12 col-sm-6">
+              <label for="{{ form.genre.id_for_label }}" class="form-label fw-semibold">
+                Género <span class="text-danger" aria-hidden="true">*</span>
+              </label>
+              {{ form.genre }}
+              {% if form.genre.errors %}
+                <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                  {% for error in form.genre.errors %}{{ error }}{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- year y status en la misma fila -->
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label for="{{ form.year.id_for_label }}" class="form-label fw-semibold">
+                Año
+              </label>
+              {{ form.year }}
+              {% if form.year.errors %}
+                <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                  {% for error in form.year.errors %}{{ error }}{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            <div class="col-12 col-sm-6">
+              <label for="{{ form.status.id_for_label }}" class="form-label fw-semibold">
+                Estado <span class="text-danger" aria-hidden="true">*</span>
+              </label>
+              {{ form.status }}
+              {% if form.status.errors %}
+                <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                  {% for error in form.status.errors %}{{ error }}{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- rating -->
+          <div class="mb-3" id="rating-wrapper">
+            <label for="{{ form.rating.id_for_label }}" class="form-label fw-semibold">
+              Puntuación
+              <small class="text-muted fw-normal">(solo si está Visto)</small>
+            </label>
+            {{ form.rating }}
+            {% if form.rating.errors %}
+              <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                {% for error in form.rating.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- notes -->
+          <div class="mb-4">
+            <label for="{{ form.notes.id_for_label }}" class="form-label fw-semibold">
+              Notas
+            </label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+              <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                {% for error in form.notes.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Botones -->
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-solid fa-floppy-disk me-1"></i>Guardar
+            </button>
+            <a href="{% url 'title-list' %}" class="btn btn-outline-secondary">
+              <i class="fa-solid fa-xmark me-1"></i>Cancelar
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Deshabilita el campo rating si el estado no es "watched"
+  (function () {
+    const statusField = document.getElementById("{{ form.status.id_for_label }}");
+    const ratingField = document.getElementById("{{ form.rating.id_for_label }}");
+
+    function toggleRating() {
+      const isWatched = statusField.value === "watched";
+      ratingField.disabled = !isWatched;
+      ratingField.closest("#rating-wrapper").style.opacity = isWatched ? "1" : "0.5";
+    }
+
+    statusField.addEventListener("change", toggleRating);
+    toggleRating(); // ejecutar al cargar la página
+  })();
+</script>
+{% endblock %}
