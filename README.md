@@ -198,3 +198,6 @@ test_views.py
 Hooks: ya existen lint-on-save y test-on-task-complete; ambos os avisan al guardar/guardar tarea, así que da igual en qué fichero trabajéis.
 v1.1: es un cambio de requisitos formal. Hay que editar antes requirements.md (US-06 ya está) y design.md (diagrama ER v1.1 ya está), según el bloque 8 de tasks.md. A hace la parte de datos y B la de presentación, en ese orden.
 ¿Quieres que marque directamente esta asignación en tasks.md (por ejemplo etiquetando cada tarea con [A] / [B]) para que quede trazado en el repo, o prefieres dejarlo solo como plan?
+
+
+https://gamma.app/docs/Desarrollo-con-IA-Spec-Driven-Development-con-Kiro-2qtpiud0scni56k
