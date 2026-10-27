@@ -40,4 +40,3 @@ build/
 # Logs
 *.log
 .env
-/app/src/.env

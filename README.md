@@ -92,20 +92,16 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # 3. Instalar dependencias
-pip install -r requirements.txt
-
-# 4. Configurar variables de entorno
-copy .env.example .env
-# Editar .env y establecer una SECRET_KEY
+pip install -r app/src/requirements.txt
 
 # 5. Crear la base de datos (SQLite — se genera automáticamente)
-python manage.py migrate
+python app/src/manage.py migrate
 
 # 6. (Opcional) Crear superusuario para el admin de Django
-python manage.py createsuperuser
+python app/src/manage.py createsuperuser
 
 # 7. Arrancar el servidor de desarrollo
-python manage.py runserver
+python app/src/manage.py runserver
 ```
 
 La aplicación estará disponible en: **http://127.0.0.1:8000**  
