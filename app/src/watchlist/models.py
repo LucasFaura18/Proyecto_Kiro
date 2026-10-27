@@ -54,6 +54,9 @@ class Title(models.Model):
         status: Estado de visionado (``pending``/``watching``/``watched``).
         rating: Puntuación 1-5 (solo si ``status == "watched"``).
         notes: Notas libres (opcional).
+        tmdb_id: Identificador único en TMDB (null si se añadió manualmente).
+        synopsis: Sinopsis corta importada de TMDB.
+        poster_url: URL del póster de TMDB.
     """
 
     name = models.CharField(max_length=200, verbose_name="título")
@@ -77,6 +80,18 @@ class Title(models.Model):
         verbose_name="puntuación",
     )
     notes = models.TextField(blank=True, verbose_name="notas")
+    # --- Campos TMDB (v1.2) -----------------------------------------------
+    # Identificador único en TMDB. Permite detectar duplicados (AC-07.5).
+    # null/blank porque los títulos añadidos manualmente no tienen tmdb_id.
+    tmdb_id = models.PositiveIntegerField(
+        null=True, blank=True, unique=True, db_index=True, verbose_name="ID TMDB"
+    )
+    # Sinopsis corta importada de TMDB.
+    synopsis = models.TextField(blank=True, verbose_name="sinopsis")
+    # URL del póster devuelta por TMDB (imagen remota).
+    poster_url = models.URLField(
+        max_length=500, blank=True, verbose_name="URL del póster"
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="creado")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="actualizado")
 

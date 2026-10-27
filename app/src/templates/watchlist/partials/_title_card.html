@@ -2,15 +2,41 @@
 Partial: _title_card.html
 Uso: {% include "watchlist/partials/_title_card.html" with title=title %}
 {% endcomment %}
-<div class="card h-100 shadow-sm">
+<div class="card h-100 shadow-sm title-card-anim">
+
+  <!-- Póster (solo si viene de TMDB) -->
+  {% if title.poster_url %}
+    <a href="{% url 'title-detail' title.pk %}" aria-label="Ver detalle de {{ title.name }}">
+      <img
+        src="{{ title.poster_url }}"
+        class="card-img-top"
+        alt="Póster de {{ title.name }}"
+        loading="lazy"
+        style="object-fit:cover;height:280px;"
+      />
+    </a>
+  {% else %}
+    <div
+      class="card-img-top d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-secondary"
+      style="height:280px;"
+      aria-hidden="true"
+    >
+      {% if title.title_type == "movie" %}
+        <i class="fa-solid fa-film fa-3x opacity-25"></i>
+      {% else %}
+        <i class="fa-solid fa-tv fa-3x opacity-25"></i>
+      {% endif %}
+    </div>
+  {% endif %}
+
   <div class="card-body d-flex flex-column gap-2">
 
     <!-- Cabecera: icono de tipo + nombre -->
     <div class="d-flex align-items-start gap-2">
       {% if title.title_type == "movie" %}
-        <i class="fa-solid fa-film text-secondary mt-1" title="Película"></i>
+        <i class="fa-solid fa-film text-secondary mt-1 flex-shrink-0" title="Película"></i>
       {% else %}
-        <i class="fa-solid fa-tv text-secondary mt-1" title="Serie"></i>
+        <i class="fa-solid fa-tv text-secondary mt-1 flex-shrink-0" title="Serie"></i>
       {% endif %}
       <h5 class="card-title mb-0 lh-sm">{{ title.name }}</h5>
     </div>
@@ -47,9 +73,18 @@ Uso: {% include "watchlist/partials/_title_card.html" with title=title %}
       </div>
     {% endif %}
 
-    <!-- Notas (truncadas) -->
-    {% if title.notes %}
-      <p class="card-text text-muted small mb-0" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
+    <!-- Sinopsis (TMDB) o notas, truncadas a 2 líneas con tooltip completo -->
+    {% if title.synopsis %}
+      <p
+        class="card-text text-muted small mb-0 text-truncate-2"
+        title="{{ title.synopsis }}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="bottom"
+      >
+        {{ title.synopsis }}
+      </p>
+    {% elif title.notes %}
+      <p class="card-text text-muted small mb-0 text-truncate-2">
         {{ title.notes }}
       </p>
     {% endif %}
@@ -91,7 +126,7 @@ Uso: {% include "watchlist/partials/_title_card.html" with title=title %}
         class="btn btn-sm btn-outline-danger"
         aria-label="Eliminar '{{ title.name }}'"
       >
-        <i class="fa-solid fa-trash me-1"></i>
+        <i class="fa-solid fa-trash me-1"></i>Eliminar
       </a>
 
     </div>

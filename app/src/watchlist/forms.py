@@ -68,3 +68,32 @@ class TitleForm(forms.ModelForm):
         if year < 1888 or year > current_year + 2:
             raise ValidationError(f"El año debe estar entre 1888 y {current_year + 2}.")
         return year
+
+
+class TitleEditForm(forms.ModelForm):
+    """``ModelForm`` restringido para editar un título existente.
+
+    Solo permite modificar estado, puntuación y notas. Los campos de
+    identidad (name, title_type, genre, year) son de solo lectura: vienen
+    de TMDB y no deben alterarse manualmente.
+    """
+
+    class Meta:
+        model = Title
+        fields = ["status", "rating", "notes"]
+        widgets = {
+            "status": forms.Select(attrs={"class": "form-select"}),
+            "rating": forms.NumberInput(
+                attrs={"class": "form-control", "min": 1, "max": 5}
+            ),
+            "notes": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+        }
+
+    def clean(self) -> dict:
+        """Limpia la puntuación si el estado no es ``"watched"``."""
+        cleaned_data = super().clean()
+        status = cleaned_data.get("status")
+        rating = cleaned_data.get("rating")
+        if status != "watched" and rating is not None:
+            cleaned_data["rating"] = None
+        return cleaned_data

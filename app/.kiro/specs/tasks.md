@@ -171,3 +171,75 @@
 - [ ] **T-12.9** Añadir tests para las nuevas funcionalidades
 
 *Requisitos cubiertos: US-06 (AC-06.1, AC-06.2, AC-06.3, AC-06.4)*
+
+
+---
+
+## BLOQUE 9 — Integración TMDB (v1.2 · US-07)
+
+> Activado tras la entrega del MVP. Gestión del cambio según metodología Kiro SDD:
+> 1. Editado `requirements.md` añadiendo US-07 y sus criterios de aceptación.
+> 2. Actualizado `design.md` con el nuevo modelo, diagrama ER v1.2 y flujo TMDB.
+> 3. Añadidas las tareas de este bloque a `tasks.md`.
+> 4. Las tareas completadas del MVP se preservan.
+
+### T-13 · Modelo — campo `tmdb_id`, `synopsis` y `poster_url`
+- [x] **T-13.1** Añadir campo `tmdb_id` (`PositiveIntegerField`, null/blank, unique, db_index) al modelo `Title`
+- [x] **T-13.2** Añadir campo `synopsis` (`TextField`, blank=True) al modelo `Title`
+- [x] **T-13.3** Añadir campo `poster_url` (`URLField`, max_length=500, blank=True) al modelo `Title`
+- [x] **T-13.4** Crear y aplicar migración (`makemigrations` + `migrate`)
+
+*Requisitos cubiertos: AC-07.4, AC-07.5*
+
+### T-14 · Configuración
+- [x] **T-14.1** Añadir variable `TMDB_API_READ_TOKEN` al fichero `.env`
+- [x] **T-14.2** Leer `TMDB_API_READ_TOKEN` en `settings.py` mediante `django-environ`
+- [x] **T-14.3** Añadir `requests` a `requirements.txt` e instalarlo en el entorno virtual
+
+*Requisitos cubiertos: RNF-05, RNF-06*
+
+### T-15 · Capa de servicios TMDB
+- [x] **T-15.1** Implementar `search_tmdb(query: str) -> list[dict]` en `services.py`
+  - Llama a `https://api.themoviedb.org/3/search/multi` con el token Bearer
+  - Filtra solo resultados de tipo `movie` y `tv`
+  - Normaliza cada resultado: `tmdb_id`, `media_type`, `title`, `year`, `genre`, `synopsis`, `poster_url`
+  - Gestiona errores de red y HTTP (devuelve lista vacía + log)
+- [x] **T-15.2** Implementar `add_from_tmdb(tmdb_id: int, media_type: str, title: str, year: int | None, genre: str, synopsis: str, poster_url: str) -> Title`
+  - Comprueba duplicado por `tmdb_id`; lanza `DuplicateTitleError` si ya existe
+  - Crea el `Title` con `status="pending"` y los datos recibidos
+- [x] **T-15.3** Implementar `map_tmdb_genre(genre_ids: list[int]) -> str` con la tabla de mapeo del diseño
+- [x] **T-15.4** Definir excepción `DuplicateTitleError` en `services.py`
+
+*Requisitos cubiertos: AC-07.1, AC-07.4, AC-07.5*
+
+### T-16 · Vistas y URLs
+- [x] **T-16.1** Implementar `TmdbSearchView(View)` en `views.py`
+  - GET sin parámetros: muestra formulario de búsqueda vacío
+  - GET con `?q=<término>`: llama a `search_tmdb()`, pasa resultados al contexto
+  - Valida que `q` no esté vacío o solo espacios (AC-07.7)
+- [x] **T-16.2** Implementar `TmdbAddView(View)` en `views.py`
+  - Solo POST
+  - Recibe `tmdb_id`, `media_type`, `title`, `year`, `genre`, `synopsis`, `poster_url` del formulario
+  - Llama a `add_from_tmdb()`; captura `DuplicateTitleError` y muestra aviso (AC-07.5)
+  - Redirige a `title-list` con mensaje de éxito (AC-07.6)
+- [x] **T-16.3** Añadir rutas `tmdb-search` y `tmdb-add` a `watchlist/urls.py`
+
+*Requisitos cubiertos: AC-07.1, AC-07.2, AC-07.3, AC-07.4, AC-07.5, AC-07.6, AC-07.7*
+
+### T-17 · Templates
+- [x] **T-17.1** Crear `templates/watchlist/tmdb_search.html` con formulario de búsqueda y grid de resultados
+- [x] **T-17.2** Crear partial `templates/watchlist/partials/_tmdb_result_card.html` con póster, título, año, género y botón "Añadir"
+- [x] **T-17.3** Añadir enlace "Buscar en TMDB" en `base.html` (navbar) y en el estado vacío de `title_list.html`
+
+*Requisitos cubiertos: AC-07.1, AC-07.2, AC-07.4*
+
+
+---
+
+## BLOQUE 10 — TMDB como única fuente (v1.3 · US-08)
+
+### T-18 · Navegación y UX
+- [x] **T-18.1** Eliminar enlace "Buscar TMDB" de la navbar; convertir el botón "Añadir" en "Añadir título" apuntando a `tmdb-search`
+- [x] **T-18.2** Actualizar estado vacío de `title_list.html`: el único botón apunta a `tmdb-search`
+- [x] **T-18.3** Actualizar el título/subtítulo de `tmdb_search.html` para reflejar su nuevo rol principal
+- [x] **T-18.4** Actualizar docstring de `urls.py` marcando `/add/` como acceso solo interno/admin

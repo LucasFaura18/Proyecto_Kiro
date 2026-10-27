@@ -225,3 +225,116 @@ erDiagram
 
 Plataformas predefinidas: Netflix, HBO Max, Disney+, Prime Video, Movistar+, Otros.  
 Se cargarán con un `data migration` al hacer `migrate`.
+
+
+---
+
+## Evolución del modelo — v1.2 (Integración TMDB · US-07)
+
+### Cambio en el modelo `Title`
+
+Se añade el campo `tmdb_id` para identificar de forma unívoca los títulos importados desde TMDB y evitar duplicados (AC-07.5). El campo es opcional para preservar la compatibilidad con títulos añadidos manualmente.
+
+```python
+tmdb_id = PositiveIntegerField(null=True, blank=True, unique=True, db_index=True)
+synopsis = TextField(blank=True)  # sinopsis corta de TMDB (reutiliza notes si synopsis está vacío)
+poster_url = URLField(max_length=500, blank=True)  # URL del póster de TMDB
+```
+
+### Diagrama ER — v1.2
+
+```mermaid
+erDiagram
+    TITLE {
+        int id PK
+        string name
+        string title_type
+        string genre
+        int year
+        string status
+        int rating
+        text notes
+        int tmdb_id "null=True, unique=True"
+        text synopsis "blank=True"
+        string poster_url "blank=True"
+        datetime created_at
+        datetime updated_at
+    }
+```
+
+### Nuevo servicio TMDB — `services.py`
+
+```python
+def search_tmdb(query: str) -> list[dict]:
+    """Llama a /search/multi de TMDB y devuelve resultados normalizados."""
+
+def add_from_tmdb(tmdb_id: int, media_type: str) -> Title:
+    """Crea un Title desde un resultado TMDB. Lanza DuplicateTitleError si ya existe."""
+```
+
+### Nuevas URLs y vistas (v1.2)
+
+| URL | Nombre | View | Descripción |
+|---|---|---|---|
+| `/search/` | `tmdb-search` | `TmdbSearchView` | Formulario de búsqueda + resultados |
+| `/search/add/` | `tmdb-add` | `TmdbAddView` | POST: crea el título desde datos TMDB |
+
+### Flujo de datos — Buscar y añadir desde TMDB
+
+```mermaid
+sequenceDiagram
+    actor U as 👤 Usuario
+    participant V as TmdbSearchView
+    participant S as services.py
+    participant API as TMDB API
+    participant DB as db.sqlite3
+
+    U->>V: GET /search/?q=inception
+    V->>S: search_tmdb("inception")
+    S->>API: GET /search/multi?query=inception
+    API-->>S: JSON resultados
+    S-->>V: lista normalizada
+    V->>U: Página de resultados con pósteres
+
+    U->>V: POST /search/add/ (tmdb_id, media_type)
+    V->>S: add_from_tmdb(tmdb_id, media_type)
+    S->>DB: Title.objects.create(...)
+    DB-->>V: Title creado
+    V->>U: Redirect lista + mensaje éxito
+```
+
+### Mapeo de géneros TMDB → GENRE_CHOICES
+
+TMDB devuelve una lista de IDs de géneros. Se mapea al género más relevante de `GENRE_CHOICES`. Los géneros sin equivalencia directa se mapean a `"other"`.
+
+| Géneros TMDB (id) | GENRE_CHOICES |
+|---|---|
+| 28 (Acción), 12 (Aventura), 10759 | `"action"` |
+| 35 | `"comedy"` |
+| 18, 10766 | `"drama"` |
+| 27, 9648 | `"horror"` |
+| 878, 10765 | `"scifi"` |
+| 99 | `"documentary"` |
+| 16 | `"animation"` |
+| 53, 80 | `"thriller"` |
+| 10749 | `"romance"` |
+| resto | `"other"` |
+
+
+---
+
+## Cambio de navegación — v1.3 (US-08)
+
+### TMDB como único punto de entrada para añadir
+
+A partir de v1.3, el formulario manual (`/add/`) queda fuera de la navegación pública. El único flujo para añadir un título es:
+
+```
+Navbar "Añadir título"  →  /search/  →  resultados TMDB  →  POST /search/add/  →  watchlist
+```
+
+| Antes (v1.2) | Después (v1.3) |
+|---|---|
+| Navbar: "Buscar TMDB" + botón "Añadir" (→ `/add/`) | Navbar: un único botón "Añadir título" (→ `/search/`) |
+| Estado vacío: botón "Añade tu primer título" (→ `/add/`) + "Buscar en TMDB" | Estado vacío: un único botón "Añade tu primer título" (→ `/search/`) |
+| `/add/` accesible desde la UI | `/add/` existe en URLs pero sin enlace en la UI (acceso solo directo o admin) |

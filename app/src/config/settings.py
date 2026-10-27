@@ -110,5 +110,10 @@ USE_TZ = True
 # --- Ficheros estaticos --------------------------------------------------
 STATIC_URL = "static/"
 
+# --- TMDB API (v1.2) -------------------------------------------------------
+# Token de solo lectura (Bearer) de la API de TMDB.
+# Se lee desde .env; nunca se hardcodea en el código fuente.
+TMDB_API_READ_TOKEN = env("TMDB_API_READ_TOKEN", default="")
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

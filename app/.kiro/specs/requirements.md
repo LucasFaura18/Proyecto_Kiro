@@ -121,3 +121,56 @@
 | AC-06.2 | **When** el usuario filtra por plataforma, **then** la lista muestra solo los títulos disponibles en esa plataforma. |
 | AC-06.3 | **When** un título no tiene plataforma asignada, **then** aparece como "Sin plataforma asignada". |
 | AC-06.4 | **When** se añade el filtro de plataforma, **then** puede combinarse con el filtro de género existente. |
+
+---
+
+## Cambio de requisitos — v1.2 (Integración TMDB · US-07)
+
+> Añadido siguiendo la metodología Kiro SDD. Las historias US-01–US-06 se preservan íntegras.
+
+---
+
+### US-07 · Buscar títulos mediante la API de TMDB y añadirlos a la watchlist
+
+**Como** usuario,  
+**quiero** poder buscar películas y series por nombre usando la base de datos de TMDB,  
+**para** añadirlas a mi watchlist sin tener que introducir manualmente todos los datos.
+
+#### Criterios de aceptación
+
+| ID | Criterio (EARS) |
+|---|---|
+| AC-07.1 | **When** el usuario introduce un término de búsqueda y pulsa "Buscar", **then** el sistema muestra una lista de resultados con póster, título, año, géneros y sinopsis obtenidos de TMDB. |
+| AC-07.2 | **When** la búsqueda no devuelve resultados, **then** el sistema muestra el mensaje "No se han encontrado resultados para «<término>»." |
+| AC-07.3 | **When** la API de TMDB no está disponible o devuelve error, **then** el sistema muestra un mensaje de error amigable y no interrumpe las demás funcionalidades. |
+| AC-07.4 | **When** el usuario pulsa "Añadir a mi lista" en un resultado, **then** el título se crea en la watchlist con los datos prefijados de TMDB (nombre, tipo, año, géneros → genre mapeado, sinopsis → notes) y estado "Pendiente". |
+| AC-07.5 | **When** el usuario intenta añadir un título que ya existe en su watchlist (mismo `tmdb_id`), **then** el sistema muestra un aviso "Este título ya está en tu lista" y no crea un duplicado. |
+| AC-07.6 | **When** el usuario añade un resultado de TMDB, **then** el sistema redirige a la lista principal con un mensaje de confirmación. |
+| AC-07.7 | **When** la búsqueda contiene solo espacios o está vacía, **then** el sistema no llama a la API y muestra un aviso de validación. |
+
+---
+
+## Requisitos no funcionales adicionales (v1.2)
+
+| ID | Requisito |
+|---|---|
+| RNF-05 | El token de la API de TMDB se almacena exclusivamente en `.env` y nunca se incluye en el código fuente ni en Git. |
+| RNF-06 | Las llamadas a la API de TMDB se realizan desde el backend Django; el navegador nunca recibe ni expone el token. |
+
+---
+
+## Cambio de requisitos — v1.3 (TMDB como única fuente · US-08)
+
+### US-08 · TMDB como único punto de entrada para añadir títulos
+
+**Como** usuario,  
+**quiero** que la única forma de añadir un título sea buscándolo en TMDB,  
+**para** garantizar que todos los títulos de mi lista tienen datos reales y consistentes (póster, sinopsis, año correcto).
+
+#### Criterios de aceptación
+
+| ID | Criterio (EARS) |
+|---|---|
+| AC-08.1 | **When** el usuario pulsa "Añadir título" en cualquier parte de la app, **then** el sistema le lleva directamente a la búsqueda TMDB, nunca al formulario manual. |
+| AC-08.2 | **When** el usuario accede a la URL `/add/` directamente, **then** el formulario sigue siendo funcional (uso interno/admin), pero no aparece en la navegación pública. |
+| AC-08.3 | **When** la lista está vacía, **then** el botón de acción vacía lleva a la búsqueda TMDB. |

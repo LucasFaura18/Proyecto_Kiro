@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load watchlist_tags %}
+
+{% block title %}Buscar en TMDB — CineTrack{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h1 class="h3 mb-0">
+    <i class="fa-solid fa-magnifying-glass me-2"></i>Añadir título
+  </h1>
+  <p class="text-muted small mt-1 mb-0">
+    Busca la película o serie en TMDB y pulsa "Añadir a mi lista".
+  </p>
+</div>
+
+<!-- Formulario de búsqueda -->
+<form method="get" action="{% url 'tmdb-search' %}" class="row g-2 align-items-end mb-4">
+  <div class="col-12 col-md-9">
+    <label for="id_q" class="form-label fw-semibold">
+      <i class="fa-solid fa-film me-1"></i>Título de la película o serie
+    </label>
+    <input
+      type="search"
+      id="id_q"
+      name="q"
+      class="form-control form-control-lg"
+      placeholder="Ej: Inception, Breaking Bad…"
+      value="{{ query|default:'' }}"
+      autocomplete="off"
+      aria-label="Término de búsqueda"
+      autofocus
+    />
+  </div>
+  <div class="col-12 col-md-3">
+    <button type="submit" class="btn btn-primary btn-lg w-100">
+      <i class="fa-solid fa-magnifying-glass me-1"></i>Buscar
+    </button>
+  </div>
+</form>
+
+<!-- Error de API -->
+{% if error %}
+  <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>{{ error }}</span>
+  </div>
+{% endif %}
+
+<!-- Resultados -->
+{% if query %}
+  {% if results %}
+    <p class="text-muted small">
+      {{ results|length }} resultado{{ results|length|pluralize:",s" }} para
+      <strong>«{{ query }}»</strong>
+    </p>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+      {% for result in results %}
+        <div class="col">
+          {% include "watchlist/partials/_tmdb_result_card.html" with result=result %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    {% if not error %}
+      <!-- Sin resultados (AC-07.2) -->
+      <div class="text-center py-5 text-muted" role="status" aria-live="polite">
+        <i class="fa-solid fa-magnifying-glass fa-3x mb-3 d-block opacity-25"></i>
+        <p class="fs-5">No se han encontrado resultados para <strong>«{{ query }}»</strong>.</p>
+        <p class="small">Prueba con otro nombre o comprueba la ortografía.</p>
+      </div>
+    {% endif %}
+  {% endif %}
+{% else %}
+  <!-- Estado inicial: sin búsqueda -->
+  <div class="text-center py-5 text-muted">
+    <i class="fa-solid fa-clapperboard fa-3x mb-3 d-block opacity-25"></i>
+    <p class="fs-5">Introduce un título para empezar a buscar.</p>
+  </div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Spinner en el botón "Añadir a mi lista" al hacer submit (mejora 4 — feedback visual)
+  document.querySelectorAll('.tmdb-add-form').forEach(function (form) {
+    form.addEventListener('submit', function () {
+      const btn = form.querySelector('.btn-add-tmdb');
+      if (!btn) return;
+      btn.disabled = true;
+      btn.querySelector('.btn-label').classList.add('d-none');
+      btn.querySelector('.btn-spinner').classList.remove('d-none');
+    });
+  });
+</script>
+{% endblock %}

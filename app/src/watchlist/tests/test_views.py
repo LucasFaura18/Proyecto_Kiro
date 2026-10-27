@@ -31,7 +31,7 @@ def test_create_view_get_returns_200(client):
     """GET /add/ devuelve el formulario vacío."""
     response = client.get(reverse("title-create"))
     assert response.status_code == 200
-    assert b"Añadir título" in response.content
+    assert "Añadir título" in response.content.decode("utf-8")
 
 
 @pytest.mark.django_db

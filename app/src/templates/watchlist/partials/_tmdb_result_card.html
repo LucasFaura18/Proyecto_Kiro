@@ -1,0 +1,115 @@
+{% comment %}
+Partial: _tmdb_result_card.html
+Uso: {% include "watchlist/partials/_tmdb_result_card.html" with result=result existing_ids=existing_ids %}
+Muestra un resultado de búsqueda TMDB con póster, metadatos y botón de añadir.
+Si result.tmdb_id está en existing_ids, muestra badge "Ya en tu lista" y desactiva el botón.
+{% endcomment %}
+{% load watchlist_tags %}
+
+<div class="card h-100 shadow-sm title-card-anim position-relative">
+
+  <!-- Badge superpuesto "Ya en tu lista" -->
+  {% if result.tmdb_id|in_set:existing_ids %}
+    <span
+      class="position-absolute top-0 start-0 m-2 badge bg-success shadow-sm"
+      style="z-index:2;"
+    >
+      <i class="fa-solid fa-check me-1"></i>Ya en tu lista
+    </span>
+  {% endif %}
+
+  <!-- Póster -->
+  {% if result.poster_url %}
+    <img
+      src="{{ result.poster_url }}"
+      class="card-img-top"
+      alt="Póster de {{ result.title }}"
+      loading="lazy"
+      style="object-fit:cover;height:300px;"
+    />
+  {% else %}
+    <div
+      class="card-img-top d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-secondary"
+      style="height:300px;"
+      aria-label="Sin póster disponible"
+    >
+      <i class="fa-solid fa-image fa-3x opacity-25"></i>
+    </div>
+  {% endif %}
+
+  <div class="card-body d-flex flex-column gap-2">
+
+    <!-- Tipo -->
+    <div>
+      {% if result.media_type == "movie" %}
+        <span class="badge bg-primary">
+          <i class="fa-solid fa-film me-1"></i>Película
+        </span>
+      {% else %}
+        <span class="badge bg-info text-dark">
+          <i class="fa-solid fa-tv me-1"></i>Serie
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- Título y año -->
+    <h5 class="card-title mb-0 lh-sm">
+      {{ result.title }}
+      {% if result.year %}
+        <small class="text-muted fw-normal fs-6">({{ result.year }})</small>
+      {% endif %}
+    </h5>
+
+    <!-- Sinopsis truncada con tooltip al hacer hover -->
+    {% if result.synopsis %}
+      <p
+        class="card-text text-muted small mb-0 text-truncate-2"
+        title="{{ result.synopsis }}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="bottom"
+      >
+        {{ result.synopsis }}
+      </p>
+    {% endif %}
+
+    <!-- Botón añadir / ya añadido -->
+    <div class="mt-auto pt-2 border-top">
+      {% if result.tmdb_id|in_set:existing_ids %}
+        <!-- Ya en la lista: botón desactivado -->
+        <button
+          class="btn btn-sm btn-outline-success w-100"
+          disabled
+          aria-disabled="true"
+        >
+          <i class="fa-solid fa-check me-1"></i>Ya en tu lista
+        </button>
+      {% else %}
+        <!-- Añadir con feedback de spinner -->
+        <form method="post" action="{% url 'tmdb-add' %}" class="tmdb-add-form">
+          {% csrf_token %}
+          <input type="hidden" name="tmdb_id"    value="{{ result.tmdb_id }}">
+          <input type="hidden" name="media_type" value="{{ result.media_type }}">
+          <input type="hidden" name="title"      value="{{ result.title }}">
+          <input type="hidden" name="year"       value="{{ result.year|default:'' }}">
+          <input type="hidden" name="genre"      value="{{ result.genre }}">
+          <input type="hidden" name="synopsis"   value="{{ result.synopsis }}">
+          <input type="hidden" name="poster_url" value="{{ result.poster_url }}">
+          <button
+            type="submit"
+            class="btn btn-sm btn-warning w-100 btn-add-tmdb"
+            aria-label="Añadir «{{ result.title }}» a mi lista"
+          >
+            <span class="btn-label">
+              <i class="fa-solid fa-plus me-1"></i>Añadir a mi lista
+            </span>
+            <span class="btn-spinner d-none">
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              Añadiendo…
+            </span>
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+  </div>
+</div>

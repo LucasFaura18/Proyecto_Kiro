@@ -31,51 +31,80 @@
           </div>
         {% endif %}
 
+        <!-- Datos de identidad (solo lectura en modo edición) -->
+        {% if form.instance.pk %}
+          <div class="mb-4 p-3 bg-light rounded border">
+            <p class="text-muted small fw-semibold text-uppercase mb-2">
+              <i class="fa-solid fa-lock me-1"></i>Datos de TMDB (no editables)
+            </p>
+            <div class="row g-2 small">
+              <div class="col-12">
+                <span class="text-muted">Título:</span>
+                <strong class="ms-1">{{ form.instance.name }}</strong>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Tipo:</span>
+                <strong class="ms-1">{{ form.instance.get_title_type_display }}</strong>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Género:</span>
+                <strong class="ms-1">{{ form.instance.get_genre_display }}</strong>
+              </div>
+              {% if form.instance.year %}
+              <div class="col-6">
+                <span class="text-muted">Año:</span>
+                <strong class="ms-1">{{ form.instance.year }}</strong>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
         <form method="post" novalidate>
           {% csrf_token %}
 
-          <!-- name -->
-          <div class="mb-3">
-            <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">
-              Título <span class="text-danger" aria-hidden="true">*</span>
-            </label>
-            {{ form.name }}
-            {% if form.name.errors %}
-              <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
-                {% for error in form.name.errors %}{{ error }}{% endfor %}
+          {% if not form.instance.pk %}
+            <!-- name — solo en modo creación -->
+            <div class="mb-3">
+              <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">
+                Título <span class="text-danger" aria-hidden="true">*</span>
+              </label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                  {% for error in form.name.errors %}{{ error }}{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- title_type y genre — solo en modo creación -->
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-sm-6">
+                <label for="{{ form.title_type.id_for_label }}" class="form-label fw-semibold">
+                  Tipo <span class="text-danger" aria-hidden="true">*</span>
+                </label>
+                {{ form.title_type }}
+                {% if form.title_type.errors %}
+                  <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                    {% for error in form.title_type.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
               </div>
-            {% endif %}
-          </div>
-
-          <!-- title_type y genre en la misma fila -->
-          <div class="row g-3 mb-3">
-            <div class="col-12 col-sm-6">
-              <label for="{{ form.title_type.id_for_label }}" class="form-label fw-semibold">
-                Tipo <span class="text-danger" aria-hidden="true">*</span>
-              </label>
-              {{ form.title_type }}
-              {% if form.title_type.errors %}
-                <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
-                  {% for error in form.title_type.errors %}{{ error }}{% endfor %}
-                </div>
-              {% endif %}
+              <div class="col-12 col-sm-6">
+                <label for="{{ form.genre.id_for_label }}" class="form-label fw-semibold">
+                  Género <span class="text-danger" aria-hidden="true">*</span>
+                </label>
+                {{ form.genre }}
+                {% if form.genre.errors %}
+                  <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                    {% for error in form.genre.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
             </div>
-            <div class="col-12 col-sm-6">
-              <label for="{{ form.genre.id_for_label }}" class="form-label fw-semibold">
-                Género <span class="text-danger" aria-hidden="true">*</span>
-              </label>
-              {{ form.genre }}
-              {% if form.genre.errors %}
-                <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
-                  {% for error in form.genre.errors %}{{ error }}{% endfor %}
-                </div>
-              {% endif %}
-            </div>
-          </div>
 
-          <!-- year y status en la misma fila -->
-          <div class="row g-3 mb-3">
-            <div class="col-12 col-sm-6">
+            <!-- year — solo en modo creación -->
+            <div class="mb-3">
               <label for="{{ form.year.id_for_label }}" class="form-label fw-semibold">
                 Año
               </label>
@@ -86,17 +115,19 @@
                 </div>
               {% endif %}
             </div>
-            <div class="col-12 col-sm-6">
-              <label for="{{ form.status.id_for_label }}" class="form-label fw-semibold">
-                Estado <span class="text-danger" aria-hidden="true">*</span>
-              </label>
-              {{ form.status }}
-              {% if form.status.errors %}
-                <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
-                  {% for error in form.status.errors %}{{ error }}{% endfor %}
-                </div>
-              {% endif %}
-            </div>
+          {% endif %}
+
+          <!-- status -->
+          <div class="mb-3">
+            <label for="{{ form.status.id_for_label }}" class="form-label fw-semibold">
+              Estado <span class="text-danger" aria-hidden="true">*</span>
+            </label>
+            {{ form.status }}
+            {% if form.status.errors %}
+              <div class="invalid-feedback d-block" role="alert" aria-live="assertive">
+                {% for error in form.status.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
           </div>
 
           <!-- rating -->
@@ -150,6 +181,7 @@
   (function () {
     const statusField = document.getElementById("{{ form.status.id_for_label }}");
     const ratingField = document.getElementById("{{ form.rating.id_for_label }}");
+    if (!statusField || !ratingField) return;
 
     function toggleRating() {
       const isWatched = statusField.value === "watched";
@@ -158,7 +190,7 @@
     }
 
     statusField.addEventListener("change", toggleRating);
-    toggleRating(); // ejecutar al cargar la página
+    toggleRating();
   })();
 </script>
 {% endblock %}

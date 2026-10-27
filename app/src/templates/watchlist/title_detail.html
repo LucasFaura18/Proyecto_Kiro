@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title.name }} — CineTrack{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- Columna póster -->
+  <div class="col-12 col-md-4 col-lg-3">
+    {% if title.poster_url %}
+      <img
+        src="{{ title.poster_url }}"
+        class="img-fluid rounded shadow"
+        alt="Póster de {{ title.name }}"
+      />
+    {% else %}
+      <div
+        class="d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 rounded"
+        style="height:400px;"
+        aria-hidden="true"
+      >
+        {% if title.title_type == "movie" %}
+          <i class="fa-solid fa-film fa-5x text-secondary opacity-25"></i>
+        {% else %}
+          <i class="fa-solid fa-tv fa-5x text-secondary opacity-25"></i>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Columna info -->
+  <div class="col-12 col-md-8 col-lg-9">
+    <div class="d-flex align-items-center gap-2 mb-1">
+      {% if title.title_type == "movie" %}
+        <span class="badge bg-primary"><i class="fa-solid fa-film me-1"></i>Película</span>
+      {% else %}
+        <span class="badge bg-info text-dark"><i class="fa-solid fa-tv me-1"></i>Serie</span>
+      {% endif %}
+      <span class="badge bg-secondary">{{ title.get_genre_display }}</span>
+      {% if title.year %}
+        <span class="text-muted">{{ title.year }}</span>
+      {% endif %}
+    </div>
+
+    <h1 class="h2 fw-bold mb-2">{{ title.name }}</h1>
+
+    <!-- Estado y puntuación -->
+    <div class="d-flex align-items-center gap-3 mb-3">
+      {% if title.status == "pending" %}
+        <span class="badge bg-warning text-dark fs-6">
+          <i class="fa-regular fa-clock me-1"></i>Pendiente
+        </span>
+      {% elif title.status == "watching" %}
+        <span class="badge bg-info text-dark fs-6">
+          <i class="fa-solid fa-play me-1"></i>Viendo
+        </span>
+      {% else %}
+        <span class="badge bg-success fs-6">
+          <i class="fa-solid fa-check me-1"></i>Visto
+        </span>
+      {% endif %}
+      {% if title.status == "watched" %}
+        <span>
+          {% include "watchlist/partials/_star_rating.html" with rating=title.rating %}
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- Sinopsis -->
+    {% if title.synopsis %}
+      <h6 class="text-muted text-uppercase fw-semibold small mb-1">Sinopsis</h6>
+      <p class="mb-3">{{ title.synopsis }}</p>
+    {% endif %}
+
+    <!-- Notas personales -->
+    {% if title.notes %}
+      <h6 class="text-muted text-uppercase fw-semibold small mb-1">Mis notas</h6>
+      <p class="mb-3 fst-italic text-muted">{{ title.notes }}</p>
+    {% endif %}
+
+    <!-- Acciones -->
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      {% if title.status != "watched" %}
+        <form method="post" action="{% url 'title-status' title.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-primary"
+            aria-label="Avanzar estado de {{ title.name }}">
+            <i class="fa-solid fa-forward-step me-1"></i>
+            {% if title.status == "pending" %}Empezar a ver{% else %}Marcar como visto{% endif %}
+          </button>
+        </form>
+      {% endif %}
+      <a href="{% url 'title-update' title.pk %}" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-pen me-1"></i>Editar
+      </a>
+      <a href="{% url 'title-delete' title.pk %}" class="btn btn-outline-danger">
+        <i class="fa-solid fa-trash me-1"></i>Eliminar
+      </a>
+      <a href="{% url 'title-list' %}" class="btn btn-outline-dark">
+        <i class="fa-solid fa-arrow-left me-1"></i>Volver a mi lista
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
