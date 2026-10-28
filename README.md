@@ -58,6 +58,14 @@ Proyecto_Kiro/
 
 **CineTrack** es una watchlist personal de películas y series construida con Django y Python. Permite gestionar títulos con estado de visionado, puntuación por estrellas y filtrado por género, con integración directa con la API de TMDB.
 
+
+## Captura de pantalla de la app
+
+<p align="left">
+  <img src="screenshots/cinetrack_captura.png" alt="CineTrack - Vista de la aplicación" width="750">
+</p>
+
+
 ### Funcionalidades del MVP (v1.0)
 
 | # | Funcionalidad |
